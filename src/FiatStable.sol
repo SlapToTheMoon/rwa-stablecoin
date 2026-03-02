@@ -3,13 +3,17 @@ pragma solidity ^0.8.20;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {AccessControl} from "@openzeppelin/contracts/access/AccessControl.sol";
+import {ReserveLedger} from "./ReserveLedger.sol";
 
 // Based on OpenZeppelin ERC20 + AccessControl pattern
 // Source: OpenZeppelin/openzeppelin-contracts @ fd81a96f01cc42ef1c9a5399364968d0e07e9e90
 contract FiatStable is ERC20, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    constructor() ERC20("Fiat Stable USD", "fUSD") {
+    ReserveLedger public immutable ledger;
+
+    constructor(ReserveLedger ledger_) ERC20("Fiat Stable USD", "fUSD") {
+        ledger = ledger_;
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         // TODO: also grant MINTER_ROLE to deployer
         _grantRole(MINTER_ROLE, msg.sender);
@@ -20,7 +24,8 @@ contract FiatStable is ERC20, AccessControl {
     }
 
     function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
-        // TODO: mint to address `to`
+        // supply-after-mint must be <= reserves
+        require(totalSupply() + amount <= ledger.reportedReserves(), "exceeds reserves");
         _mint(to, amount);
     }
 

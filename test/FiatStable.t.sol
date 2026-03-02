@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
 import "../src/FiatStable.sol";
+import "../src/ReserveLedger.sol";
 
 contract FiatStableTest is Test {
     FiatStable token;
@@ -10,7 +11,8 @@ contract FiatStableTest is Test {
     address user = address(1);
 
     function setUp() public {
-        token = new FiatStable();
+        ReserveLedger ledger = new ReserveLedger(address(this));
+        token = new FiatStable(ledger);
     }
 
     function testInitialRoles() public {
