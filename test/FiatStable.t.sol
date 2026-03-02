@@ -6,13 +6,15 @@ import "../src/FiatStable.sol";
 import "../src/ReserveLedger.sol";
 
 contract FiatStableTest is Test {
+    ReserveLedger ledger;
     FiatStable token;
 
     address user = address(1);
 
     function setUp() public {
-        ReserveLedger ledger = new ReserveLedger(address(this));
+        ledger = new ReserveLedger(address(this));
         token = new FiatStable(ledger);
+        ledger.reportReserves(1_000_000e6);
     }
 
     function testInitialRoles() public {

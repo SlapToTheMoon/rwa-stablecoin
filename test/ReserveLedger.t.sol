@@ -19,8 +19,7 @@ contract ReserveLedgerTest is Test {
     function testMintBlockedWhenExceedsReserves() public {
         ledger.reportReserves(50e6); // $50.000000
 
-        // trying to mint $100 should revert
-        vm.expectRevert();
+        vm.expectRevert(bytes("exceeds reserves"));
         stable.mint(user, 100e6);
     }
 
