@@ -42,4 +42,36 @@ contract FiatStableTest is Test {
         vm.expectRevert();
         token.mint(user, 100e6);
     }
+
+    event Minted(address indexed to, uint256 amount);
+    event Burned(address indexed from, uint256 amount);
+
+    function testPauseBlocksMintAndBurn() public {
+        token.pause();
+
+        vm.expectRevert(abi.encodeWithSignature("EnforcedPause()"));
+        token.mint(user, 1e6);
+
+        // mint first, then pause, then try burn
+        token.unpause();
+        token.mint(user, 2e6);
+
+        token.pause();
+        vm.expectRevert(abi.encodeWithSignature("EnforcedPause()"));
+        token.burn(user, 1e6);
+    }
+
+    function testMintEmitsEvent() public {
+        vm.expectEmit(true, false, false, true);
+        emit Minted(user, 5e6);
+        token.mint(user, 5e6);
+    }
+
+    function testBurnEmitsEvent() public {
+        token.mint(user, 5e6);
+
+        vm.expectEmit(true, false, false, true);
+        emit Burned(user, 2e6);
+        token.burn(user, 2e6);
+    }
 }
