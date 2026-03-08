@@ -4,17 +4,22 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 import "../src/FiatStable.sol";
 import "../src/ReserveLedger.sol";
+import "../src/MockReservesOracle.sol";
 
 contract FiatStableTest is Test {
     ReserveLedger ledger;
     FiatStable token;
+    MockReservesOracle oracle;
 
     address user = address(1);
 
     function setUp() public {
-        ledger = new ReserveLedger(address(this));
+        oracle = new MockReservesOracle();
+        ledger = new ReserveLedger(address(this), oracle);
         token = new FiatStable(ledger);
-        ledger.reportReserves(1_000_000e6);
+
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
     }
 
     function testInitialRoles() public {
