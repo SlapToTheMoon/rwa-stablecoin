@@ -6,8 +6,5 @@ import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.so
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract YieldVault4626 is ERC4626 {
-    constructor(IERC20 asset_)
-        ERC20("Yield fUSD", "yfUSD")
-        ERC4626(asset_)
-    {}
+    constructor(IERC20 asset_) ERC20("Yield fUSD", "yfUSD") ERC4626(asset_) {}
 }
