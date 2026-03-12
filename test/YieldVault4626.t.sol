@@ -64,4 +64,20 @@ contract YieldVault4626Test is Test {
         assertEq(vault.totalAssets(), 150e6);
         assertEq(token.balanceOf(address(vault)), 150e6);
     }
+
+    function testRedeemReturnsAssets() public {
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        token.mint(address(this), 100e6);
+        token.approve(address(vault), 100e6);
+
+        vault.deposit(100e6, address(this));
+
+        uint256 assets = vault.redeem(50e6, address(this), address(this));
+
+        assertEq(assets, 50e6);
+        assertEq(vault.balanceOf(address(this)), 50e6);
+        assertEq(vault.totalAssets(), 50e6);
+    }
 }
