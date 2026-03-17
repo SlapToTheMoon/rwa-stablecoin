@@ -99,4 +99,29 @@ contract YieldVault4626Test is Test {
         assertEq(assets, expectedAssets);
         assertEq(assets, 119999999);
     }
+
+    function testDepositAfterYieldGetsFewerShares() public {
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        // user1 (you)
+        token.mint(address(this), 100e6);
+        token.approve(address(vault), 100e6);
+        vault.deposit(100e6, address(this));
+
+        // simulate yield
+        token.mint(address(vault), 20e6);
+
+        // user2 enters after yield
+        address user2 = address(2);
+        token.mint(user2, 60e6);
+
+        vm.startPrank(user2);
+        token.approve(address(vault), 60e6);
+
+        uint256 shares = vault.deposit(60e6, user2);
+        vm.stopPrank();
+
+        assertEq(shares, 50e6);
+    }
 }
