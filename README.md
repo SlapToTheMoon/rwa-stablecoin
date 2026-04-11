@@ -1,66 +1,25 @@
-## Foundry
+# RWA Stablecoin System
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+A reserve-backed stablecoin with an ERC-4626 vault that enforces supply constraints and enables yield via share-based accounting.
 
-Foundry consists of:
+---
 
-- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
-- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
-- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
-- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Overview
 
-## Documentation
+This system is composed of four core components:
 
-https://book.getfoundry.sh/
+- **Reserve Oracle** — Reports total reserves backing the system  
+- **Reserve Ledger** — Syncs and stores reserves on-chain, enforcing constraints  
+- **Stablecoin (FiatStable)** — Mintable only up to reported reserves  
+- **ERC-4626 Vault (YieldVault4626)** — Wraps the asset and tracks yield via share price  
 
-## Usage
+Data flow:
 
-### Build
+Oracle → Ledger → Stablecoin → Vault
 
-```shell
-$ forge build
-```
+---
 
-### Test
+## Core Invariant
 
-```shell
-$ forge test
-```
 
-### Format
 
-```shell
-$ forge fmt
-```
-
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
