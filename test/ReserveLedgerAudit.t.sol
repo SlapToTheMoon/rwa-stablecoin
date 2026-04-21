@@ -21,13 +21,13 @@ contract ReserveLedgerAuditTest is Test {
     }
 
     function testCompromisedOracleAllowsExcessMint() public {
-    oracle.setReserves(1_000_000e6);
-    ledger.syncReservesFromOracle();
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
 
-    stable.mint(user, 1_000_000e6);
+        stable.mint(user, 1_000_000e6);
 
-    assertEq(stable.totalSupply(), 1_000_000e6);
-    assertEq(stable.balanceOf(user), 1_000_000e6);
-    assertEq(ledger.reportedReserves(), 1_000_000e6);
-}
+        assertEq(stable.totalSupply(), 1_000_000e6);
+        assertEq(stable.balanceOf(user), 1_000_000e6);
+        assertEq(ledger.reportedReserves(), 1_000_000e6);
+    }
 }
