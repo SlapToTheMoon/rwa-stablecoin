@@ -46,4 +46,17 @@ contract ReserveLedgerAuditTest is Test {
         assertEq(stable.balanceOf(user), 1_000_000e6);
         assertEq(ledger.reportedReserves(), 1_000_000e6);
     }
+
+    function testPauseContainsDamageAfterSuspiciousReserveSync() public {
+        // attacker or bad oracle inflates reserves
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        // governance reacts
+        stable.pause();
+
+        // mint should now fail even though reserves look high
+        vm.expectRevert(abi.encodeWithSignature("EnforcedPause()"));
+        stable.mint(user, 100e6);
+    }
 }
