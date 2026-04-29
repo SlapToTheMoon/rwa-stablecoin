@@ -59,4 +59,18 @@ contract ReserveLedgerAuditTest is Test {
         vm.expectRevert(abi.encodeWithSignature("EnforcedPause()"));
         stable.mint(user, 100e6);
     }
+
+    function testCompromisedMinterCanMintUpToReserves() public {
+        address attacker = address(99);
+
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        stable.grantRole(stable.MINTER_ROLE(), attacker);
+
+        vm.prank(attacker);
+        stable.mint(attacker, 1_000_000e6);
+
+        assertEq(stable.balanceOf(attacker), 1_000_000e6);
+    }
 }
