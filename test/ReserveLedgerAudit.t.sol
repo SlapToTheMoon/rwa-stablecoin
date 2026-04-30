@@ -73,4 +73,21 @@ contract ReserveLedgerAuditTest is Test {
 
         assertEq(stable.balanceOf(attacker), 1_000_000e6);
     }
+
+    function testMinterCanBurnFromAnyUser() public {
+        address attacker = address(99);
+        address victim = address(1);
+
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        stable.mint(victim, 100e6);
+
+        stable.grantRole(stable.MINTER_ROLE(), attacker);
+
+        vm.prank(attacker);
+        stable.burn(victim, 40e6);
+
+        assertEq(stable.balanceOf(victim), 60e6);
+    }
 }
