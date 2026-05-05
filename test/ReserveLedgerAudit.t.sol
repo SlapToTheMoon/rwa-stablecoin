@@ -86,7 +86,7 @@ contract ReserveLedgerAuditTest is Test {
         stable.grantRole(stable.MINTER_ROLE(), attacker);
 
         vm.prank(attacker);
-        stable.burn(victim, 40e6);
+        stable.issuerBurn(victim, 40e6);
 
         assertEq(stable.balanceOf(victim), 60e6);
     }
