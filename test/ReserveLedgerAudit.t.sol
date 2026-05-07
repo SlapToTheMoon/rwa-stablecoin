@@ -90,4 +90,27 @@ contract ReserveLedgerAuditTest is Test {
 
         assertEq(stable.balanceOf(victim), 60e6);
     }
+
+    function testStaleOracleAllowsOverMintBeforeUpdate() public {
+        address attacker = address(99);
+
+        // Step 1: initial high reserves
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        // Step 2: real reserves drop OFF-CHAIN (not synced yet)
+        oracle.setReserves(100e6); // lower value
+
+        // Step 3: attacker mints before sync
+        stable.grantRole(stable.MINTER_ROLE(), attacker);
+
+        vm.prank(attacker);
+        stable.mint(attacker, 1_000_000e6);
+
+        // Step 4: now sync happens (too late)
+        ledger.syncReservesFromOracle();
+
+        // Step 5: system is now inconsistent
+        assertGt(stable.totalSupply(), 100e6);
+    }
 }
