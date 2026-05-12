@@ -9,6 +9,7 @@ import {ReserveLedger} from "./ReserveLedger.sol";
 contract FiatStable is ERC20, AccessControl, Pausable {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
+    uint256 public constant MAX_RESERVE_AGE = 1 days;
 
     event Minted(address indexed to, uint256 amount);
     event Burned(address indexed from, uint256 amount);
@@ -28,6 +29,7 @@ contract FiatStable is ERC20, AccessControl, Pausable {
     }
 
     function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) whenNotPaused {
+        require(block.timestamp - ledger.lastUpdated() <= MAX_RESERVE_AGE, "stale reserves");
         require(totalSupply() + amount <= ledger.reportedReserves(), "exceeds reserves");
 
         _mint(to, amount);

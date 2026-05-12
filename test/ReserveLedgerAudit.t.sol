@@ -113,4 +113,14 @@ contract ReserveLedgerAuditTest is Test {
         // Step 5: system is now inconsistent
         assertGt(stable.totalSupply(), 100e6);
     }
+
+    function testMintRevertsWhenReservesAreStale() public {
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        vm.warp(block.timestamp + 2 days);
+
+        vm.expectRevert(bytes("stale reserves"));
+        stable.mint(user, 100e6);
+    }
 }

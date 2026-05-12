@@ -31,6 +31,8 @@ contract ReserveLedger is AccessControl {
     ///      A value of zero means no reserves have been reported yet, blocking all minting.
     uint256 public reportedReserves;
 
+    uint256 public lastUpdated;
+
     /// @notice Emitted when `reportedReserves` is updated via a successful oracle sync.
     /// @param newReserves The reserve amount written to storage, in 6-decimal stablecoin units.
     event ReservesReported(uint256 newReserves);
@@ -53,6 +55,7 @@ contract ReserveLedger is AccessControl {
     function syncReservesFromOracle() external onlyRole(RESERVE_REPORTER_ROLE) {
         uint256 newReserves = oracle.getReserves();
         reportedReserves = newReserves;
+        lastUpdated = block.timestamp;
         emit ReservesReported(newReserves);
     }
 }
