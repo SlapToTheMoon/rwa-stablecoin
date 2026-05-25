@@ -40,10 +40,10 @@ contract ReserveLedgerAuditTest is Test {
         oracle.setReserves(1_000_000e6);
         ledger.syncReservesFromOracle();
 
-        stable.mint(user, 1_000_000e6);
+        stable.mint(user, 100_000e6);
 
-        assertEq(stable.totalSupply(), 1_000_000e6);
-        assertEq(stable.balanceOf(user), 1_000_000e6);
+        assertEq(stable.totalSupply(), 100_000e6);
+        assertEq(stable.balanceOf(user), 100_000e6);
         assertEq(ledger.reportedReserves(), 1_000_000e6);
     }
 
@@ -69,9 +69,8 @@ contract ReserveLedgerAuditTest is Test {
         stable.grantRole(stable.MINTER_ROLE(), attacker);
 
         vm.prank(attacker);
-        stable.mint(attacker, 1_000_000e6);
-
-        assertEq(stable.balanceOf(attacker), 1_000_000e6);
+        stable.mint(attacker, 100_000e6);
+assertEq(stable.balanceOf(attacker), 100_000e6);
     }
 
     function testMinterCanBurnFromAnyUser() public {
@@ -105,7 +104,7 @@ contract ReserveLedgerAuditTest is Test {
         stable.grantRole(stable.MINTER_ROLE(), attacker);
 
         vm.prank(attacker);
-        stable.mint(attacker, 1_000_000e6);
+        stable.mint(attacker, 100_000e6);
 
         // Step 4: now sync happens (too late)
         ledger.syncReservesFromOracle();
@@ -122,5 +121,15 @@ contract ReserveLedgerAuditTest is Test {
 
         vm.expectRevert(bytes("stale reserves"));
         stable.mint(user, 100e6);
+    }
+
+    function testMintFailsWhenExceedingDailyLimit() public {
+        oracle.setReserves(1_000_000e6);
+        ledger.syncReservesFromOracle();
+
+        stable.mint(user, 100_000e6);
+
+        vm.expectRevert(bytes("mint limit exceeded"));
+        stable.mint(user, 1e6);
     }
 }
